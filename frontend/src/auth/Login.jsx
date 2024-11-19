@@ -1,118 +1,161 @@
-import React, { useContext, useState } from "react";
-import { BottomGradient, LabelInputContainer } from "../components/ui/index";
+import { useEffect, useState } from "react";
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
-import { Live, LiveView, Loading } from "../svg/svg";
-import { UserContext } from "../context/UserContext";
-import { Link, useNavigate } from "react-router-dom";
-import { postLogin } from "@/service/post.service";
-import { toast } from "react-toastify";
-
+import { useMask } from "@react-input/mask";
+import { LiaSpinnerSolid } from "react-icons/lia";
+import { useNavigate } from "react-router-dom";
+import { BottomGradient, LabelInputContainer } from "@/components/ui";
+import { CheckBox } from "@/svg/svg";
+import Opt from "./Opt";
 const Login = () => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [phone, setPhone] = useState("+998");
+  const [isLogin, setisLogin] = useState(true);
+  const [isChecked, setIsChecked] = useState(true);
   const [isLoading, setisLoading] = useState(false);
-  const root = useNavigate();
-  const { setRender } = useContext(UserContext);
-  const [user, setUser] = useState({
-    email: "",
-    password: "",
+  const router = useNavigate();
+  const [error, setError] = useState({
+    tel: true,
+    chek: true,
   });
-  const handleSubmit = async (e) => {
+  const inputRef = useMask({
+    mask: "+998 (__) ___-__-__",
+    replacement: { _: /\d/ },
+  });
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setisLoading(true);
-    try {
-      const res = await postLogin(user);
-      if (res?.access_token) {
-        localStorage.setItem("access_token", JSON.stringify(res?.access_token));
-        root("/");
-        setRender(res);
-      } else {
-        toast.error(res);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setUser({
-        email: "",
-        password: "",
-      });
-      setisLoading(false);
+    setError({
+      tel: phone?.length === 19,
+      chek: isChecked,
+    });
+    if (phone?.length === 19 && isChecked) {
+      setisLoading(true);
+      setTimeout(() => {
+        setisLoading(false);
+        localStorage.setItem("user", JSON.stringify(phone));
+        // router("/");
+        setError({
+          tel: true,
+          chek: true,
+        });
+        setisLogin(false);
+      }, [1000]);
     }
   };
+  useEffect(() => {
+    if (!phone.includes("+998")) {
+      setPhone("+998");
+    }
+  }, [phone]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUser({ ...user, [name]: value });
+  const handleChange = (value) => {
+    setPhone(value);
+    setError({
+      ...error,
+      tel: value.length === 19,
+    });
+  };
+
+  const handleCheckboxChange = () => {
+    setIsChecked(!isChecked);
+    if (!isChecked) {
+      setError({ ...error, chek: true });
+    } else {
+      setError({ ...error, chek: false });
+    }
   };
 
   return (
     <div className="h-screen  flex items-center justify-center ">
-      <div className="sign max-w-md w-full mx-auto rounded-2xl  p-4 md:p-8 shadow-input bg-white dark:bg-black  ">
-        <h2 className="font-bold text-xl text-center text-neutral-800 dark:text-neutral-200">
-          Kirish
-        </h2>
-        <p className="text-neutral-600 text-center text-sm max-w-sm mt-2 dark:text-neutral-300 ">
-          <b>Chatda</b> ishlashni davom ettirish uchun
-        </p>
-        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent mt-2h-[1px] w-full" />
-        <form onSubmit={handleSubmit}>
-          <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4"></div>
-          <LabelInputContainer className="mb-4">
-            <Label htmlFor="email">Pochta</Label>
-            <Input
-              onChange={handleChange}
-              required
-              name="email"
-              id="email"
-              type="email"
-              value={user.email}
-            />
-          </LabelInputContainer>
-          <LabelInputContainer className="mb-4 relative  ">
-            <Label htmlFor="password">Parol</Label>
-            <Input
-              onChange={handleChange}
-              required
-              name="password"
-              id="password"
-              type={showPassword ? "text" : "password"}
-              value={user.password}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-5 top-7 opacity-[0.7] bg-red z-10"
-            >
-              {showPassword ? <Live /> : <LiveView />}
-            </button>
-          </LabelInputContainer>
-          <button
-            disabled={isLoading}
-            className={`${
-              isLoading && "dark:bg-[#1a1e3e] cursor-not-allowed  bg-[#eaf0f6]"
-            } group/btn  uppercase relative bg-[#f0f5fa] border  dark:bg-[#10132b] dark:text-[#f0f5fa] flex w-full px-5 py-3 items-center justify-center gap-1 rounded-md text-[14px] font-[500]`}
-            type="submit"
-          >
-            {isLoading ? (
-              <Loading />
-            ) : (
-              <>
-                Davom etish <span className="block">&rarr;</span>
-              </>
-            )}
-            <BottomGradient />
-          </button>
-          <p className="text-[13px] flex gap-2 pt-3 pl-3 ">
-            Akkount yo'qmi ?{" "}
-            <Link to={"/register"} className="text-blue-500 hover:underline ">
-              Ro'yxatdan o'tish
-            </Link>
+      {isLogin ? (
+        <div className=" w-[448px] h-[412px] max-mobilem:max-w-[95%] mx-auto rounded-2xl  p-4 md:p-8 shadow-input  bg-white dark:bg-black  ">
+          <h2 className="font-bold text-xl  text-center text-neutral-800 dark:text-neutral-200">
+            Kirish
+          </h2>
+          <p className="text-neutral-600 text-center text-sm max-w-sm mt-2 dark:text-neutral-300 ">
+            <b>Chatda</b> ishlashni davom ettirish uchun
           </p>
-          <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-        </form>
-      </div>
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4"></div>
+            <LabelInputContainer className="mb-4">
+              <Label
+                className="flex justify-between gap-[2px] text-[14px] font-[600] text-dark_two"
+                htmlFor="phone"
+              >
+                <span className="flex gap-2">
+                  Telefon
+                  <span className="text-input-text">*</span>
+                </span>
+                <span className="text-[12px] text-input-text">
+                  {error?.tel ? "" : "To'liq raqamni kiriting!"}
+                </span>
+              </Label>
+              <Input
+                value={phone}
+                ref={inputRef}
+                required
+                name="phone"
+                id="phone"
+                type="tel"
+                placeholder="+998"
+                onChange={(e) => handleChange(e.target.value)}
+                className="placeholder:text-black  h-[50px] text-[18px]"
+              />
+              <div className="flex items-center mb-0 px-2">
+                <label className="inline-flex items-center gap-4">
+                  <input
+                    type="checkbox"
+                    className="hidden"
+                    onClick={handleCheckboxChange}
+                  />
+                  <span
+                    className={`w-[38px] flex justify-center items-center h-6 border max-desktop:w-6 max-mobilelm:w-[44px]  border-border_input rounded-md cursor-pointer shadow-sm ${
+                      isChecked
+                        ? "bg-gradient-to-br  text-input-text group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600  dark:bg-zinc-800  font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+                        : "bg-slate-300 border-gray-300"
+                    } flex items-center justify-center`}
+                  >
+                    {isChecked && <CheckBox />}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleCheckboxChange}
+                    className="text-gray-700 block text-left bg-transparent dark:text-slate-300 text-[14px] cursor-pointer "
+                  >
+                    Shartlar bilan tanishganligimni va ularga roziligimni
+                    tasdiqlayman.
+                    <span className="text-input-text">Ommaviy oferta</span>
+                  </button>
+                </label>
+              </div>
+              <span className="pb-3 text-input-text text-[14px]">
+                {error.chek ? "" : "Siyosat shartlarini qabul qiling"}
+              </span>
+            </LabelInputContainer>
+            <button
+              className={`${
+                isLoading &&
+                "dark:bg-[#1a1e3e] cursor-not-allowed  bg-[#eaf0f6]"
+              } group/btn  uppercase relative bg-[#f0f5fa] border  dark:bg-[#10132b] dark:text-[#f0f5fa] flex w-full px-5 py-3 items-center justify-center gap-1 rounded-md text-[14px] font-[500]`}
+              type="submit"
+            >
+              {isLoading ? (
+                <LiaSpinnerSolid className="text-light text-[22px] animate-spin" />
+              ) : (
+                <>
+                  Davom etish
+                  <span className="pb-1  flex items-center">&rarr;</span>
+                </>
+              )}
+              <BottomGradient />
+            </button>
+            <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 mt-[20px] h-[1px] w-full" />
+          </form>
+        </div>
+      ) : (
+        <Opt state={{ isLogin, setisLogin, phone }} />
+      )}
     </div>
   );
 };
-
 export default Login;

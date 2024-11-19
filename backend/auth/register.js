@@ -10,12 +10,11 @@ const generateJWTToken = (userId) => {
 };
 
 router.post("/", async (req, res) => {
-  const { lastname, firstname, email, password } = req.body;
+  const { lastname, firstname, phone } = req.body;
   const fields = [
     { field: lastname, errorMessage: "Familiyangizni kiriting" },
     { field: firstname, errorMessage: "Ismingizni kiriting" },
-    { field: email, errorMessage: "Emailni kiriting" },
-    { field: password, errorMessage: "Parolni kiriting" },
+    { field: phone, errorMessage: "Emailni kiriting" },
   ];
 
   for (const { field, errorMessage } of fields) {
@@ -25,7 +24,7 @@ router.post("/", async (req, res) => {
   }
   try {
     // Taqdim etilgan name  ega foydalanuvchi mavjudligini tekshirish
-    const userExists = await Register.findOne({ email });
+    const userExists = await Register.findOne({ phone });
     if (userExists) {
       return res.status(400).json({ error: "Foydalanuvchi mavjud" });
     }

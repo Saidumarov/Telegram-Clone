@@ -1,38 +1,26 @@
-import { createContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { createContext, useState, useMemo, useContext } from "react";
 
-export const UserContext = createContext();
+// Context yaratish
+const UserContext = createContext();
 
+// Custom Hook (contextdan foydalanishni osonlashtirish)
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUser must be used within a UserProvider");
+  }
+  return context;
+};
+
+// Context Provider
 function UserProvider({ children }) {
-  const [render, setRender] = useState(0);
-  const router = useNavigate();
-  const url = window.location.pathname;
-  useEffect(() => {
-    try {
-      const access_token = JSON.parse(localStorage.getItem("access_token"));
-      if (access_token) {
-        if (url === "/login" || url === "/register") {
-          return router("/");
-        }
-      } else {
-        if (url !== "/login" && url !== "/register") {
-          return router("/login");
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [url, render]);
+  const [userPhone, setUserPhone] = useState(null);
+
+  // Value-ni memoize qilish (Keraksiz qayta render oldini olish)
+  const value = useMemo(() => ({ userPhone, setUserPhone }), [userPhone]);
 
   return (
-    <UserContext.Provider
-      value={{
-        render,
-        setRender,
-      }}
-    >
-      {children}
-    </UserContext.Provider>
+    <UserContext.Provider value={{ value }}>{children}</UserContext.Provider>
   );
 }
 

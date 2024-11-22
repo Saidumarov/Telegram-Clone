@@ -1,4 +1,4 @@
-export async function cleanPhoneNumber(phoneNumber) {
+export function cleanPhoneNumber(phoneNumber) {
   return phoneNumber.replace(/[^\d]/g, "");
 }
 

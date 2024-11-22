@@ -1,7 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-
 const ThemeProviderContext = createContext();
-
 export function ThemeProvider({
   children,
   defaultTheme = "system",
@@ -23,7 +21,6 @@ export function ThemeProvider({
       root.classList.add(systemTheme);
       return;
     }
-
     root.classList.add(theme);
   }, [theme]);
 
@@ -44,9 +41,7 @@ export function ThemeProvider({
 
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
-
   if (context === undefined)
     throw new Error("useTheme must be used within a ThemeProvider");
-
   return context;
 };

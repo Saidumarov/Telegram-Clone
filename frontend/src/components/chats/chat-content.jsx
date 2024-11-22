@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-
 export const chat = [
   {
     id: 1,
@@ -57,22 +56,22 @@ const Chat_content = ({ menu, data }) => {
     }
   }, [ChatData]);
   return (
-    <div className="w-full  h-[85%] overflow-hidden">
+    <div className="w-full   h-[85%] overflow-hidden">
       <div
         ref={chatRef}
-        className="chat_c  overflow-y-scroll flex flex-col-reverse h-full mx-auto"
+        className="chat_c   overflow-y-scroll flex flex-col-reverse h-full mx-auto"
       >
         <div className="w-full">
           {ChatData.map((el, i) => (
             <div
               onContextMenu={menu}
               key={i}
-              className={`flex mb-3  px-[295px] ${
+              className={`flex mb-3 px-[295px] max-desktopXLL:px-[200px] max-desktopLL:px-[150px] max-desktop:px-5 ${
                 el.userId == 1 ? "justify-start" : "justify-end"
               }`}
             >
               <div
-                className={`text-white rounded-2xl pb-1.5 px-2 py-1 max-w-[30vw] ${
+                className={`text-white  rounded-2xl pb-1.5 px-2 py-1 max-w-[30vw] ${
                   el.userId == 1
                     ? "bg-gray-800 rounded-bl-none"
                     : "bg-[#7669c7] rounded-br-none"

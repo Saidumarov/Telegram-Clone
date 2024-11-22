@@ -1,17 +1,20 @@
 import { BottomGradient, LabelInputContainer } from "../components/ui/index";
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
-import { Loading } from "../svg/svg";
-import { UserContext } from "../context/UserContext";
+import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
-import { postRegister } from "@/service/post.service";
 import { toast } from "react-toastify";
-import { useContext, useState } from "react";
+import { useState } from "react";
+import { putRegister } from "@/service/put.service";
+import { useAuth } from "@/context/AuthProvider";
+import { LiaSpinnerSolid } from "react-icons/lia";
 
 const Register = () => {
   const [isLoading, setisLoading] = useState(false);
   const root = useNavigate();
-  const { setRender } = useContext(UserContext);
+  const { value } = useUser();
+  const { setToken } = useAuth();
+
   const [user, setUser] = useState({
     lastname: "",
     firstname: "",
@@ -20,11 +23,13 @@ const Register = () => {
     e.preventDefault();
     setisLoading(true);
     try {
-      const res = await postRegister(user);
+      const res = await putRegister({ ...user, phone: value.userPhone });
       if (res?.access_token) {
         localStorage.setItem("access_token", JSON.stringify(res?.access_token));
+        localStorage.setItem("id", JSON.stringify(res?.id));
+        setToken(res?.access_token);
         root("/");
-        setRender(res);
+        value.setUserPhone(null);
       } else {
         toast.error(res);
       }
@@ -46,7 +51,7 @@ const Register = () => {
 
   return (
     <div className="h-screen  flex items-center justify-center ">
-      <div className="max-w-md w-full mx-auto rounded-2xl  p-4 md:p-8 shadow-input bg-white dark:bg-black  ">
+      <div className="max-w-md w-full mx-auto rounded-2xl  p-8 shadow-input bg-white dark:bg-black  ">
         <h2 className="font-bold text-xl text-center text-neutral-800 dark:text-neutral-200">
           Kirish
         </h2>
@@ -64,6 +69,7 @@ const Register = () => {
               id="firstname"
               type="text"
               value={user?.firstname}
+              className="h-12 max-desktop:h-10"
             />
           </LabelInputContainer>
           <LabelInputContainer className="mb-4 relative  ">
@@ -75,6 +81,7 @@ const Register = () => {
               id="lastname"
               type="text"
               value={user?.lastname}
+              className="h-12 max-desktop:h-10"
             />
           </LabelInputContainer>
           <button
@@ -85,7 +92,7 @@ const Register = () => {
             type="submit"
           >
             {isLoading ? (
-              <Loading />
+              <LiaSpinnerSolid className="text-light text-[22px] animate-spin" />
             ) : (
               <>
                 Davom etish <span className="block">&rarr;</span>

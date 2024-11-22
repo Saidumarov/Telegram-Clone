@@ -3,18 +3,22 @@ const router = express.Router();
 const Register = require("../model/RegisterModel");
 const jwt = require("jsonwebtoken");
 
+// JWT token yaratish funksiyasi
 const generateJWTToken = (userId) => {
-  const scretKey = process.env.JWT_SECRET_KEY; // Maxfiy kalitni .env faylidan olish
-  const token = jwt.sign({ userId }, scretKey, { expiresIn: "1d" }); // Tokenning amal qilish muddati 1 kun
+  const secretKey = process.env.JWT_SECRET_KEY; // Maxfiy kalitni .env faylidan olish
+  const token = jwt.sign({ userId }, secretKey, { expiresIn: "1d" }); // Tokenning amal qilish muddati 1 kun
   return token;
 };
 
-router.post("/", async (req, res) => {
-  const { lastname, firstname, phone } = req.body;
+// Foydalanuvchi ma'lumotlarini yangilash va tokenni qaytarish
+router.put("/", async (req, res) => {
+  const { phone, lastname, firstname } = req.body;
+
+  // Kiritilgan maydonlarni tekshirish
   const fields = [
-    { field: lastname, errorMessage: "Familiyangizni kiriting" },
-    { field: firstname, errorMessage: "Ismingizni kiriting" },
-    { field: phone, errorMessage: "Emailni kiriting" },
+    { field: phone?.trim(), errorMessage: "Telefon raqamni kiriting" },
+    { field: lastname?.trim(), errorMessage: "Familiyangizni kiriting" },
+    { field: firstname?.trim(), errorMessage: "Ismingizni kiriting" },
   ];
 
   for (const { field, errorMessage } of fields) {
@@ -22,32 +26,31 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: errorMessage });
     }
   }
+
   try {
-    // Taqdim etilgan name  ega foydalanuvchi mavjudligini tekshirish
-    const userExists = await Register.findOne({ phone });
-    if (userExists) {
-      return res.status(400).json({ error: "Foydalanuvchi mavjud" });
+    // Telefon raqami bo‘yicha foydalanuvchini topish
+    const user = await Register.findOne({ phone });
+
+    if (!user) {
+      return res.status(404).json({ error: "Foydalanuvchi topilmadi" });
     }
-    // Yangi Register ob'ektini yaratish
-    const register = new Register({
-      lastname,
-      firstname,
-      email,
-      password,
-    });
-    await register.save();
-    // Foydalanuvchi idsini oling
-    const id = register._id;
-    // JWT tokenini yaratish
-    const token = generateJWTToken(id);
-    // Muvaffaqiyatli xabar, ma'lumot va token bilan javob yuborish
-    res.json({
-      message: "Ro'yxatdan muvaffaqiyatli o'tildi",
+
+    // Foydalanuvchi ma'lumotlarini yangilash
+    user.lastname = lastname;
+    user.firstname = firstname;
+
+    // Yangilangan ma'lumotlarni saqlash
+    await user.save();
+
+    // Tokenni yaratish
+    const token = generateJWTToken(user?._id);
+
+    res.status(200).json({
       access_token: token,
+      id: user?._id,
     });
   } catch (error) {
-    // Xato javobini yuborish
-    res.status(400).json({ error: err.message });
+    console.error(error);
     res.status(500).json({ error: "Server xatosi" });
   }
 });

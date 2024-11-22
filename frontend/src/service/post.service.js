@@ -1,23 +1,20 @@
-import axios from "axios";
 import { axiosInstance } from "./createToken.service";
 const BASE_URI = import.meta.env.VITE_PUBLIC_API_URL;
 
-export const postRegister = async (obj) => {
+export const postLogin = async (obj) => {
   try {
-    const res = await axios.post(`${BASE_URI}/register`, obj);
+    const res = await axiosInstance.post(`${BASE_URI}/send-code`, obj);
     return res?.data;
   } catch (error) {
-    // console.error(error.message);
     return error.response.data.error;
   }
 };
 
-export const postLogin = async (obj) => {
+export const postVeryfiycation = async (obj) => {
   try {
-    const res = await axios.post(`${BASE_URI}/login`, obj);
+    const res = await axiosInstance.post(`${BASE_URI}/verify-code`, obj);
     return res?.data;
   } catch (error) {
-    // console.error(error.message);
-    return error.response.data.error;
+    return error.response.data;
   }
 };

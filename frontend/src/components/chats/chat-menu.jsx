@@ -1,5 +1,4 @@
 import { useRef, useEffect } from "react";
-
 const CustomContextMenu = ({ state }) => {
   const { isVisible, setIsVisible, menuPosition } = state;
   const menuRef = useRef(null);

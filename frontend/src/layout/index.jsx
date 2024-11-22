@@ -3,7 +3,6 @@ import Layout_search from "@/layout/layout-search";
 import { Data } from "@/db";
 import React from "react";
 import { Outlet } from "react-router-dom";
-
 const Layout = () => {
   return (
     <div className="w-full overflow-hidden mx-auto h-screen flex justify-center items-center">

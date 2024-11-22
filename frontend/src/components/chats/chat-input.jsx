@@ -23,7 +23,7 @@ const Chat_input = ({ state }) => {
   };
   return (
     <div className="w-full relative  pt-1  h-[10%] overflow-hidden">
-      <div className="w-[60%] flex relative  justify-between  mx-auto">
+      <div className="w-[60%]  gap-5 max-desktop:gap-2 max-desktop:w-[95%] flex relative  justify-between  mx-auto">
         <form
           onSubmit={handleSubmit}
           className="flex items-center relative bg-gray-900 text-gray-200 rounded-xl px-4 py-4 w-[90%]"
@@ -41,7 +41,6 @@ const Chat_input = ({ state }) => {
           <button type="button" className="text-gray-400 hover:text-gray-200">
             <GrAttachment className="text-[24px]" />
           </button>
-          
         </form>
         <button className="text-gray-400 bg-gray-900 px-4 rounded-full">
           {message.trim() !== "" ? (

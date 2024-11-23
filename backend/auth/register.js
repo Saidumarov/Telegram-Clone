@@ -47,7 +47,6 @@ router.put("/", async (req, res) => {
 
     res.status(200).json({
       access_token: token,
-      id: user?._id,
     });
   } catch (error) {
     console.error(error);

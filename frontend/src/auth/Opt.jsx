@@ -37,7 +37,6 @@ const Opt = ({ state }) => {
       });
       if (response?.user) {
         localStorage.setItem("access_token", JSON.stringify(response?.token));
-        localStorage.setItem("id", JSON.stringify(response?.id));
         setToken(response?.token);
         router("/");
       } else {

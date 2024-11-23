@@ -44,7 +44,6 @@ router.post("/", async (req, res) => {
         message: "Kod tasdiqlandi.",
         user: true,
         token,
-        id: user?._id,
       });
     } else {
       return res.status(200).json({

@@ -26,7 +26,6 @@ const Register = () => {
       const res = await putRegister({ ...user, phone: value.userPhone });
       if (res?.access_token) {
         localStorage.setItem("access_token", JSON.stringify(res?.access_token));
-        localStorage.setItem("id", JSON.stringify(res?.id));
         setToken(res?.access_token);
         root("/");
         value.setUserPhone(null);

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const crypto = require("crypto");
-const Register = require("../model/RegisterModel");
+const Users = require("../model/UsersModel");
 
 const generateVerificationCode = () => {
   return crypto.randomInt(100000, 999999); // 6 xonali tasdiqlash kodi
@@ -20,7 +20,7 @@ router.post("/", async (req, res) => {
     // TODO: SMS Gateway orqali tasdiqlash kodini yuborish
 
     // Kodni vaqtinchalik bazada yoki keshda saqlash
-    await Register.updateOne(
+    await Users.updateOne(
       { phone },
       { phone, verificationCode },
       { upsert: true } // Foydalanuvchi mavjud bo'lmasa, yaratadi

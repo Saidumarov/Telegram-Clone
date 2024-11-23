@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Register = require("../model/RegisterModel");
+const Users = require("../model/UsersModel");
 const jwt = require("jsonwebtoken");
 
 // JWT token yaratish funksiyasi
@@ -29,7 +29,7 @@ router.put("/", async (req, res) => {
 
   try {
     // Telefon raqami bo‘yicha foydalanuvchini topish
-    const user = await Register.findOne({ phone });
+    const user = await Users.findOne({ phone });
 
     if (!user) {
       return res.status(404).json({ error: "Foydalanuvchi topilmadi" });
